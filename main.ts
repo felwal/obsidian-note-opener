@@ -50,7 +50,7 @@ export default class NoteOpenerPlugin extends Plugin {
   //
 
   openNote() {
-    const file = this.app.vault.getAbstractFileByPath(this.settings.note + ".md") as TFile;
+    const file = this.getFile(this.settings.note);
 
     if (file) {
       const leaf = this.app.workspace.getLeaf()
@@ -59,5 +59,9 @@ export default class NoteOpenerPlugin extends Plugin {
     else {
       new Notice("Could not find note '" + this.settings.note + "'");
     }
+  }
+
+  getFile(path: String): TFile | null {
+    return this.app.vault.getAbstractFileByPath(path + ".md") as TFile;
   }
 }
