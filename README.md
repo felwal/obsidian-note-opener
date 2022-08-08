@@ -1,1 +1,1 @@
-# obsidian-note-opener
+# Note Opener
