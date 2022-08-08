@@ -1,11 +1,13 @@
-import { App, Plugin, PluginSettingTab } from "obsidian";
+import { App, Notice, Plugin, PluginSettingTab, Setting, TFile } from "obsidian";
 
 interface NoteOpenerPluginSettings {
-  mySetting: string;
+  note: string;
+  icon: string;
 }
 
 const DEFAULT_SETTINGS: NoteOpenerPluginSettings = {
-  mySetting: "",
+  note: "",
+  icon: "note-glyph"
 }
 
 export default class NoteOpenerPlugin extends Plugin {
@@ -34,9 +36,33 @@ export default class NoteOpenerPlugin extends Plugin {
   }
 
   loadRibbon() {
+    this.addRibbonIcon(this.settings.icon, "Open note", (evt: MouseEvent) => {
+      this.openNote();
+    });
   }
 
   loadCommands() {
+    this.addCommand({
+      id: "open-note",
+      name: "Open note",
+      callback: () => {
+        this.openNote();
+      }
+    });
+  }
+
+  //
+
+  openNote() {
+    const file = this.app.vault.getAbstractFileByPath(this.settings.note + ".md") as TFile;
+
+    if (file) {
+      const leaf = this.app.workspace.getLeaf()
+      leaf.openFile(file, { active: true });
+    }
+    else {
+      new Notice("Could not find note '" + this.settings.note + "'");
+    }
   }
 }
 
@@ -54,5 +80,29 @@ class NoteOpenerSettingTab extends PluginSettingTab {
     containerEl.empty();
 
     containerEl.createEl("h2", { text: "General Settings" });
+
+    new Setting(containerEl)
+      .setName("Note to open")
+      .setDesc("Desc")
+      .addText(text => text
+        .setPlaceholder("Path to note")
+        .setValue(this.plugin.settings.note)
+        .onChange(async (value) => {
+          console.log("Note: " + value);
+          this.plugin.settings.note = value;
+          await this.plugin.saveSettings();
+        }));
+
+    new Setting(containerEl)
+    .setName("Ribbon icon")
+    .setDesc("Desc")
+    .addText(text => text
+      .setPlaceholder("Icon name")
+      .setValue(this.plugin.settings.icon)
+      .onChange(async (value) => {
+        console.log("Icon: " + value);
+        this.plugin.settings.icon = value;
+        await this.plugin.saveSettings();
+      }));
   }
 }
