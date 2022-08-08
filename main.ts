@@ -12,6 +12,7 @@ const DEFAULT_SETTINGS: NoteOpenerPluginSettings = {
 
 export default class NoteOpenerPlugin extends Plugin {
   settings: NoteOpenerPluginSettings;
+  ribbonIcon: HTMLElement | null = null;
 
   async onload() {
     console.log("loading plugin");
@@ -19,7 +20,6 @@ export default class NoteOpenerPlugin extends Plugin {
     await this.loadSettings();
     this.loadRibbon();
     this.loadCommands();
-
     this.addSettingTab(new NoteOpenerSettingTab(this.app, this));
   }
 
@@ -36,7 +36,12 @@ export default class NoteOpenerPlugin extends Plugin {
   }
 
   loadRibbon() {
-    this.addRibbonIcon(this.settings.icon, "Open note", (evt: MouseEvent) => {
+    // if reloading the ribbon, unload previous icon
+    if (this.ribbonIcon) {
+      this.ribbonIcon.remove();
+    }
+
+    this.ribbonIcon = this.addRibbonIcon(this.settings.icon, "Open note", (evt: MouseEvent) => {
       this.openNote();
     });
   }
@@ -103,6 +108,7 @@ class NoteOpenerSettingTab extends PluginSettingTab {
         console.log("Icon: " + value);
         this.plugin.settings.icon = value;
         await this.plugin.saveSettings();
+        this.plugin.loadRibbon();
       }));
   }
 }
