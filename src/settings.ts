@@ -36,6 +36,8 @@ export class NoteOpenerSettingTab extends PluginSettingTab {
           console.log("Note: " + value);
           this.plugin.settings.note = value;
           await this.plugin.saveSettings();
+          this.plugin.loadRibbon();
+          this.plugin.loadCommands();
         }));
 
     new Setting(containerEl)

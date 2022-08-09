@@ -32,7 +32,7 @@ export default class NoteOpenerPlugin extends Plugin {
       this.ribbonIcon.remove();
     }
 
-    this.ribbonIcon = this.addRibbonIcon(this.settings.icon, "Open note", (evt: MouseEvent) => {
+    this.ribbonIcon = this.addRibbonIcon(this.settings.icon, this.getCommandName(), (evt: MouseEvent) => {
       this.openNote();
     });
   }
@@ -40,7 +40,7 @@ export default class NoteOpenerPlugin extends Plugin {
   loadCommands() {
     this.addCommand({
       id: "open-note",
-      name: "Open note",
+      name: this.getCommandName(),
       callback: () => {
         this.openNote();
       }
@@ -61,7 +61,11 @@ export default class NoteOpenerPlugin extends Plugin {
     }
   }
 
-  getFile(path: String): TFile | null {
+  getFile(path: string): TFile | null {
     return this.app.vault.getAbstractFileByPath(path + ".md") as TFile;
+  }
+
+  getCommandName(): string {
+    return "Open '" + this.settings.note + "'";
   }
 }
