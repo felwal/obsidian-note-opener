@@ -12,11 +12,11 @@ export class OpenerNote {
 }
 
 export interface NoteOpenerPluginSettings {
-  openerNote: OpenerNote;
+  openerNotes: Array<OpenerNote>;
 }
 
 export const DEFAULT_SETTINGS: NoteOpenerPluginSettings = {
-  openerNote: new OpenerNote("", "note-glyph")
+  openerNotes: [new OpenerNote("", "note-glyph")]
 }
 
 export class NoteOpenerSettingTab extends PluginSettingTab {
@@ -27,38 +27,69 @@ export class NoteOpenerSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
-  display(): void {
-    const { containerEl } = this;
+  display() {
+    const {containerEl} = this;
 
     containerEl.empty();
+    containerEl.createEl("h2", {text: "Note shortcuts"});
 
-    containerEl.createEl("h2", { text: "General Settings" });
+    // note shortcuts
+    for (var i = 0; i < this.plugin.settings.openerNotes.length; i++) {
+      const openerNote = this.plugin.settings.openerNotes[i];
 
-    new Setting(containerEl)
-      .setName("Note to open")
-      .setDesc("Desc")
+      new Setting(containerEl)
+      .setName("Note shortcut")
+      .setDesc("Description")
       .addText(text => text
         .setPlaceholder("Path to note")
-        .setValue(this.plugin.settings.openerNote.path)
+        .setValue(openerNote.path)
         .onChange(async (value) => {
-          console.log("Note: " + value);
-          this.plugin.settings.openerNote.path = value;
+          console.log("note: " + value);
+          openerNote.path = value;
+
           await this.plugin.saveSettings();
           this.plugin.loadRibbon();
           this.plugin.loadCommands();
-        }));
+        })
+      )
+      .addText(text => text
+        .setPlaceholder("Icon name")
+        .setValue(openerNote.icon)
+        .onChange(async (value) => {
+          console.log("icon: " + value);
+          openerNote.icon = value;
 
+          await this.plugin.saveSettings();
+          this.plugin.loadRibbon();
+        })
+      )
+      .addButton(component => component
+        .setIcon("trash")
+        .onClick(async (callback) => {
+          console.log("shortcut removed");
+          this.plugin.settings.openerNotes.remove(openerNote);
+
+          await this.plugin.saveSettings();
+          this.display();
+          this.plugin.loadRibbon();
+          this.plugin.loadCommands();
+        })
+      )
+    }
+
+    // add shortcut
     new Setting(containerEl)
-    .setName("Ribbon icon")
-    .setDesc("Desc")
-    .addText(text => text
-      .setPlaceholder("Icon name")
-      .setValue(this.plugin.settings.openerNote.icon)
-      .onChange(async (value) => {
-        console.log("Icon: " + value);
-        this.plugin.settings.openerNote.icon = value;
-        await this.plugin.saveSettings();
-        this.plugin.loadRibbon();
-      }));
+      .addButton(component => component
+        .setButtonText("Add shortcut")
+        .onClick(async (callback) => {
+          console.log("shortcut added");
+          this.plugin.settings.openerNotes.push(new OpenerNote("", "note-glyph"));
+
+          await this.plugin.saveSettings();
+          this.display();
+          this.plugin.loadRibbon();
+          this.plugin.loadCommands();
+        })
+      )
   }
 }

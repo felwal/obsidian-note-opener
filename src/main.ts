@@ -1,16 +1,16 @@
 import { Notice, Plugin, TFile } from "obsidian";
-import { NoteOpenerPluginSettings, DEFAULT_SETTINGS, NoteOpenerSettingTab } from "./settings"
+import { OpenerNote, NoteOpenerPluginSettings, DEFAULT_SETTINGS, NoteOpenerSettingTab } from "./settings"
 
 export default class NoteOpenerPlugin extends Plugin {
   settings: NoteOpenerPluginSettings;
-  ribbonIcon: HTMLElement | null = null;
+  ribbonIcons: Array<HTMLElement> = new Array();
 
   async onload() {
     console.log("loading plugin");
 
     await this.loadSettings();
     this.loadRibbon();
-    this.loadCommands();
+    //this.loadCommands();
     this.addSettingTab(new NoteOpenerSettingTab(this.app, this));
   }
 
@@ -27,37 +27,47 @@ export default class NoteOpenerPlugin extends Plugin {
   }
 
   loadRibbon() {
-    // if reloading the ribbon, unload previous icon
-    if (this.ribbonIcon) {
-      this.ribbonIcon.remove();
+    // remove previous icons before reloading
+    for (var i = 0; i < this.ribbonIcons.length; i++) {
+      this.ribbonIcons[i].remove();
     }
 
-    this.ribbonIcon = this.addRibbonIcon(this.settings.openerNote.icon, this.getCommandName(), (evt: MouseEvent) => {
-      this.openNote();
-    });
+    for (var i = 0; i < this.settings.openerNotes.length; i++) {
+      const openerNote = this.settings.openerNotes[i];
+
+      const ic = this.addRibbonIcon(openerNote.icon, this.getTooltip(openerNote), (evt: MouseEvent) => {
+        this.openNote(openerNote.path);
+      });
+      this.ribbonIcons.push(ic);
+    }
   }
 
   loadCommands() {
-    this.addCommand({
-      id: "open-note",
-      name: this.getCommandName(),
-      callback: () => {
-        this.openNote();
-      }
-    });
+    // TODO: remove commands before reloading
+
+    for (var i = 0; i < this.settings.openerNotes.length; i++) {
+      const openerNote = this.settings.openerNotes[i];
+      this.addCommand({
+        id: "open-note-" + i,
+        name: this.getTooltip(openerNote),
+        callback: () => {
+          this.openNote(openerNote.path);
+        }
+      });
+    }
   }
 
   //
 
-  openNote() {
-    const file = this.getFile(this.settings.openerNote.path);
+  openNote(path: string) {
+    const file = this.getFile(path);
 
     if (file) {
       const leaf = this.app.workspace.getLeaf()
-      leaf.openFile(file, { active: true });
+      leaf.openFile(file, {active: true});
     }
     else {
-      new Notice("Could not find note '" + this.settings.openerNote.path + "'");
+      new Notice("Could not find note '" + path + "'");
     }
   }
 
@@ -65,7 +75,7 @@ export default class NoteOpenerPlugin extends Plugin {
     return this.app.vault.getAbstractFileByPath(path + ".md") as TFile;
   }
 
-  getCommandName(): string {
-    return "Open '" + this.settings.openerNote.path + "'";
+  getTooltip(openerNote: OpenerNote): string {
+    return "Open '" + openerNote.path + "'";
   }
 }
