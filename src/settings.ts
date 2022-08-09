@@ -63,8 +63,10 @@ export class NoteOpenerSettingTab extends PluginSettingTab {
           this.plugin.loadRibbon();
         })
       )
-      .addButton(component => component
+      .addButton(button => button
         .setIcon("trash")
+        .setTooltip("Delete")
+        .setWarning()
         .onClick(async (callback) => {
           console.log("shortcut removed");
           this.plugin.settings.openerNotes.remove(openerNote);
@@ -79,7 +81,7 @@ export class NoteOpenerSettingTab extends PluginSettingTab {
 
     // add shortcut
     new Setting(containerEl)
-      .addButton(component => component
+      .addButton(button => button
         .setButtonText("Add shortcut")
         .onClick(async (callback) => {
           console.log("shortcut added");
