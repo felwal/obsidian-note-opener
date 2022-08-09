@@ -32,7 +32,7 @@ export default class NoteOpenerPlugin extends Plugin {
       this.ribbonIcon.remove();
     }
 
-    this.ribbonIcon = this.addRibbonIcon(this.settings.icon, this.getCommandName(), (evt: MouseEvent) => {
+    this.ribbonIcon = this.addRibbonIcon(this.settings.openerNote.icon, this.getCommandName(), (evt: MouseEvent) => {
       this.openNote();
     });
   }
@@ -50,14 +50,14 @@ export default class NoteOpenerPlugin extends Plugin {
   //
 
   openNote() {
-    const file = this.getFile(this.settings.note);
+    const file = this.getFile(this.settings.openerNote.path);
 
     if (file) {
       const leaf = this.app.workspace.getLeaf()
       leaf.openFile(file, { active: true });
     }
     else {
-      new Notice("Could not find note '" + this.settings.note + "'");
+      new Notice("Could not find note '" + this.settings.openerNote.path + "'");
     }
   }
 
@@ -66,6 +66,6 @@ export default class NoteOpenerPlugin extends Plugin {
   }
 
   getCommandName(): string {
-    return "Open '" + this.settings.note + "'";
+    return "Open '" + this.settings.openerNote.path + "'";
   }
 }
