@@ -10,7 +10,6 @@ export default class NoteOpenerPlugin extends Plugin {
 
     await this.loadSettings();
     this.loadRibbon();
-    //this.loadCommands();
     this.addSettingTab(new NoteOpenerSettingTab(this.app, this));
   }
 
@@ -39,21 +38,6 @@ export default class NoteOpenerPlugin extends Plugin {
         this.openNote(openerNote.path);
       });
       this.ribbonIcons.push(ic);
-    }
-  }
-
-  loadCommands() {
-    // TODO: remove commands before reloading
-
-    for (var i = 0; i < this.settings.openerNotes.length; i++) {
-      const openerNote = this.settings.openerNotes[i];
-      this.addCommand({
-        id: "open-note-" + i,
-        name: this.getTooltip(openerNote),
-        callback: () => {
-          this.openNote(openerNote.path);
-        }
-      });
     }
   }
 
