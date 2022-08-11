@@ -32,34 +32,34 @@ export default class NoteOpenerPlugin extends Plugin {
     }
 
     for (var i = 0; i < this.settings.openerNotes.length; i++) {
-      const openerNote = this.settings.openerNotes[i];
-
-      const ic = this.addRibbonIcon(openerNote.icon, this.getTooltip(openerNote), (evt: MouseEvent) => {
-        this.openNote(openerNote.path);
-      });
-      this.ribbonIcons.push(ic);
+      this.addOpenerNoteRibbonIcon(this.settings.openerNotes[i]);
     }
   }
 
   //
 
-  openNote(path: string) {
-    const file = this.getFile(path);
+  addOpenerNoteRibbonIcon(openerNote: OpenerNote) {
+    const file = this.getFile(openerNote.path);
+    const displayName = file != null ? file?.basename : openerNote.path;
+    const tooltip = "Open '" + displayName + "'";
 
-    if (file) {
-      const leaf = this.app.workspace.getLeaf()
-      leaf.openFile(file, {active: true});
-    }
-    else {
-      new Notice("Could not find note '" + path + "'");
-    }
+    const ic = this.addRibbonIcon(openerNote.icon, tooltip, (evt: MouseEvent) => {
+      if (file) {
+        this.openNote(file);
+      }
+      else {
+        new Notice("Could not find note '" + openerNote.path + "'");
+      }
+    });
+
+    this.ribbonIcons.push(ic);
+  }
+
+  openNote(file: TFile) {
+    this.app.workspace.getLeaf().openFile(file, {active: true});
   }
 
   getFile(path: string): TFile | null {
     return this.app.vault.getAbstractFileByPath(path + ".md") as TFile;
-  }
-
-  getTooltip(openerNote: OpenerNote): string {
-    return "Open '" + openerNote.path + "'";
   }
 }
