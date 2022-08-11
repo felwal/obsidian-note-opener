@@ -1,5 +1,6 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import NoteOpenerPlugin from "./main"
+import { icons } from "./icons"
 
 export class OpenerNote {
   path: string;
@@ -56,17 +57,19 @@ export class NoteOpenerSettingTab extends PluginSettingTab {
           this.plugin.loadCommands();
         })
       )
-      .addText(text => text
-        .setPlaceholder("Icon name")
-        .setValue(openerNote.icon)
-        .onChange(async (value) => {
+      .addDropdown(dropdown => {
+        for (var j = 0; j < icons.length; j++) {
+          dropdown.addOption(icons[j], icons[j]);
+        }
+        dropdown.setValue(this.plugin.settings.openerNotes[i].icon);
+        dropdown.onChange(async (value) => {
           console.log("icon: " + value);
           openerNote.icon = value;
 
           await this.plugin.saveSettings();
           this.plugin.loadRibbon();
         })
-      )
+      })
       .addButton(button => button
         .setIcon("trash")
         .setTooltip("Delete")
