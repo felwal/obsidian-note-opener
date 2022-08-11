@@ -31,17 +31,21 @@ export class NoteOpenerSettingTab extends PluginSettingTab {
     const {containerEl} = this;
 
     containerEl.empty();
-    containerEl.createEl("h2", {text: "Note shortcuts"});
+    containerEl.createEl("h1", {text: "Note Opener"});
+    containerEl.createEl("h2", {text: "Shortcuts"});
+
+    if (this.plugin.settings.openerNotes.length == 0) {
+      containerEl.createEl("p", {text: "You currently have no shortcuts."});
+    }
 
     // note shortcuts
     for (var i = 0; i < this.plugin.settings.openerNotes.length; i++) {
       const openerNote = this.plugin.settings.openerNotes[i];
 
       new Setting(containerEl)
-      .setName("Note shortcut")
-      .setDesc("Description")
+      .setName("Open ...")
       .addText(text => text
-        .setPlaceholder("Path to note")
+        .setPlaceholder("Path: folder/note")
         .setValue(openerNote.path)
         .onChange(async (value) => {
           console.log("note: " + value);
