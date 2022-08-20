@@ -26,14 +26,16 @@ export default class NoteOpenerPlugin extends Plugin {
   }
 
   loadRibbon() {
-    // remove previous icons before reloading
-    for (var i = 0; i < this.ribbonIcons.length; i++) {
-      this.ribbonIcons[i].remove();
-    }
+    this.app.workspace.onLayoutReady(async () => {
+      // remove previous icons before reloading
+      for (var i = 0; i < this.ribbonIcons.length; i++) {
+        this.ribbonIcons[i].remove();
+      }
 
-    for (var i = 0; i < this.settings.openerNotes.length; i++) {
-      this.addOpenerNoteRibbonIcon(this.settings.openerNotes[i]);
-    }
+      for (var i = 0; i < this.settings.openerNotes.length; i++) {
+        this.addOpenerNoteRibbonIcon(this.settings.openerNotes[i]);
+      }
+    });
   }
 
   //
@@ -43,7 +45,7 @@ export default class NoteOpenerPlugin extends Plugin {
     const displayName = file != null ? file?.basename : openerNote.path;
     const tooltip = "Open '" + displayName + "'";
 
-    const ic = this.addRibbonIcon(openerNote.icon, tooltip, (evt: MouseEvent) => {
+    const ic = this.addRibbonIcon(openerNote.icon, tooltip, () => {
       if (file) {
         this.openNote(file);
       }

@@ -53,7 +53,6 @@ export class NoteOpenerSettingTab extends PluginSettingTab {
 
           await this.plugin.saveSettings();
           this.plugin.loadRibbon();
-          this.plugin.loadCommands();
         })
       )
       .addText(text => text
@@ -78,7 +77,6 @@ export class NoteOpenerSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings();
           this.display();
           this.plugin.loadRibbon();
-          this.plugin.loadCommands();
         })
       )
     }
@@ -94,7 +92,6 @@ export class NoteOpenerSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings();
           this.display();
           this.plugin.loadRibbon();
-          this.plugin.loadCommands();
         })
       )
   }
